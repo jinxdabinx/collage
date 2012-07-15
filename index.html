@@ -4,7 +4,7 @@
         <script type="text/javascript" src="collage.js"></script>        
         <script type="text/javascript">
             // some preloaded photo data from 500px.com
-            var photos = [
+            var defaultPhotos = [
                 {url: "http://pcdn.500px.net/9127769/441a4fc1941fb30454cdb9b729cdec265d0f002b/4.jpg",
                  width: 576,
                  id: 1,
@@ -54,31 +54,41 @@
         		 id: 12,
                  height: 800}
             ];
+            var photos;
+            var fbPhotoCache = {};
         
             $(document).ready(function() {
-                // set this to true to pull photos from facebook as an example
-                var useFB = true;                
-                if (useFB) {
-                    $.ajax({
-                        // enter the facebook album id below... 
-                        // got fb album page and you want the id after "set=a.".. 
-                        // ex/ https://www.facebook.com/media/set/?set=a.91270297357.87103.45795797357&type=3
-                      url: 'https://graph.facebook.com/91270297357/photos',
-                      dataType: 'jsonp',
-                      success: function(data) {
-                        photos = data.data;
-                        for (var i = 0; i < photos.length; i++) {
-                            photos[i].url = photos[i].source;
-                        }                    
-                        render();                                            
-                      }
-                    });                    
-                } else {
-                    render();                    
-                }
-
+                render();
             });
             function render() {
+                var fbAlbumId = $('#fbAlbumId').val();
+                if (fbAlbumId) {
+                    if (fbPhotoCache[fbAlbumId]) {
+                        photos = fbPhotoCache[fbAlbumId];
+                        doRender();
+                    } else {
+                        $.ajax({
+                            // enter the facebook album id below... 
+                            // got fb album page and you want the id after "set=a.".. 
+                            // ex/ https://www.facebook.com/media/set/?set=a.91270297357.87103.45795797357&type=3
+                          url: 'https://graph.facebook.com/' + fbAlbumId  +'/photos',
+                          dataType: 'jsonp',
+                          success: function(data) {
+                            photos = data.data;
+                            fbPhotoCache[fbAlbumId] = photos
+                            for (var i = 0; i < photos.length; i++) {
+                                photos[i].url = photos[i].source;
+                            }                    
+                            doRender();                                            
+                          }
+                        });                                            
+                    }
+                } else {
+                    photos = defaultPhotos;
+                    doRender();
+                }
+            }
+            function doRender() {                
                 var width = $('#containerWidth').val();
                 if (width) {
                     $('#here').width(width);
@@ -91,8 +101,7 @@
                     width: width
                 });
                 collage.render();
-            }
-            
+            }            
         </script>
     </head>
     <body style="background: black; color: white">
@@ -101,6 +110,7 @@
             <label for="borderWidth">Border width:</label><input value="1" type="text" id="borderWidth"/>
             <label for="targetRowHeight">Target row height:</label><input value="200" type="text" id="targetRowHeight"/>            
             <label for="containerWidth">Container width:</label><input placeholder="(optional)" value="" type="text" id="containerWidth"/>                        
+            <label for="fbAlbumId">Facebook album id:</label><input placeholder="(optional)" value="91270297357" type="text" id="fbAlbumId"/>                                    
             <input type="submit" onclick="render()"/>
             </form>
         </div>
