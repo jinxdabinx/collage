@@ -1,0 +1,111 @@
+<html>
+    <head>
+        <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
+        <script type="text/javascript" src="collage.js"></script>        
+        <script type="text/javascript">
+            // some preloaded photo data from 500px.com
+            var photos = [
+                {url: "http://pcdn.500px.net/9127769/441a4fc1941fb30454cdb9b729cdec265d0f002b/4.jpg",
+                 width: 576,
+                 id: 1,
+                 height: 900},
+        		{url: "http://pcdn.500px.net/3618115/0a626d532fdb256ea77748b137df37a655e70887/4.jpg",
+        		 width: 900,
+                 id: 2,                		
+                 height: 900},                        
+        		{url: "http://pcdn.500px.net/6218588/f102560732b017c2f998cec5a882e5ccad4206ac/4.jpg",
+        		 width: 900,
+                 id: 3,	
+                 height: 698},                
+        		{url: "http://pcdn.500px.net/3486293/85c641b4a1717c40acd145d945860a11df5db434/4.jpg",
+        		 width: 900,
+                 id: 4,
+                 height: 609},                
+        		{url: "http://pcdn.500px.net/7422106/69923d7e091e15442e28895e66ef36e43b5bac88/4.jpg",
+        		 width: 882,
+        		 id: 5,
+                 height: 800},                
+        		{url: "http://pcdn.500px.net/6324827/730768c6f7cf3e3f43a2acb2452970a762bd7e21/4.jpg",
+        		 width: 900,
+        		 id: 6,
+                 height: 598},                
+        		{url: "http://pcdn.500px.net/8821237/214bbfe435b1898c6a29f027a94622f633a85fdb/4.jpg",
+        		 width: 900,
+        		 id: 7,
+                 height: 634},                
+        		{url: "http://pcdn.500px.net/6961349/bbbcfffbf0908a09df3ceda2160171e6c2366053/4.jpg",
+        		 width: 598,
+        		 id: 8,
+                 height: 900},                
+        		{url: "http://pcdn.500px.net/3618115/0a626d532fdb256ea77748b137df37a655e70887/4.jpg",
+        		 width: 900,
+        		 id: 9,
+                 height: 900},                
+        		{url: "http://pcdn.500px.net/6218588/f102560732b017c2f998cec5a882e5ccad4206ac/4.jpg",
+        		 width: 900,
+        		 id: 10,
+                 height: 698},                
+        		{url: "http://pcdn.500px.net/3486293/85c641b4a1717c40acd145d945860a11df5db434/4.jpg",
+         		 width: 900,
+        		 id: 11,
+                 height: 609},                
+        		{url: "http://pcdn.500px.net/7422106/69923d7e091e15442e28895e66ef36e43b5bac88/4.jpg",
+        		 width: 882,
+        		 id: 12,
+                 height: 800}
+            ];
+        
+            $(document).ready(function() {
+                // set this to true to pull photos from facebook as an example
+                var useFB = true;                
+                if (useFB) {
+                    $.ajax({
+                        // enter the facebook album id below... 
+                        // got fb album page and you want the id after "set=a.".. 
+                        // ex/ https://www.facebook.com/media/set/?set=a.91270297357.87103.45795797357&type=3
+                      url: 'https://graph.facebook.com/91270297357/photos',
+                      dataType: 'jsonp',
+                      success: function(data) {
+                        photos = data.data;
+                        for (var i = 0; i < photos.length; i++) {
+                            photos[i].url = photos[i].source;
+                        }                    
+                        render();                                            
+                      }
+                    });                    
+                } else {
+                    render();                    
+                }
+
+            });
+            function render() {
+                var width = $('#containerWidth').val();
+                if (width) {
+                    $('#here').width(width);
+                }                
+                var collage = new Collage({
+                    renderTargetId: 'here',
+                    photos: photos,
+                    borderWidth: $('#borderWidth').val(),
+                    targetRowHeight: $('#targetRowHeight').val(),
+                    width: width
+                });
+                collage.render();
+            }
+            
+        </script>
+    </head>
+    <body style="background: black; color: white">
+        <div>
+            <form onsubmit="return false;">
+            <label for="borderWidth">Border width:</label><input value="1" type="text" id="borderWidth"/>
+            <label for="targetRowHeight">Target row height:</label><input value="200" type="text" id="targetRowHeight"/>            
+            <label for="containerWidth">Container width:</label><input placeholder="(optional)" value="" type="text" id="containerWidth"/>                        
+            <input type="submit" onclick="render()"/>
+            </form>
+        </div>
+        <div id="here">
+            <!-- collage will get rendered here -->
+        </div>
+    </body>
+</html>
