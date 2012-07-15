@@ -69,19 +69,22 @@ var Collage = Class.extend({
         this._containerWidth = params.width || $('#' + this._renderTargetId).width();
         this._clipSize = (params.borderWidth || this.DEFAULT_BORDER_WIDTH) * 2;
         this._targetHeight = (params.targetRowHeight || this.DEFAULT_TARGET_HEIGHT);
+        
+        var timeoutId;
+        var self = this;
+        $(window).resize(function() {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(self.doneResizing, 500);
+        });        
+    },
+    doneResizing: function(){
+      this.render();
+      // console.log('done')
     },
     
     render: function() {
         var rowData = this.setupRows();
         this.renderRows(rowData.rows, rowData.rowWidths);
-    },
-    
-    getImageWidthDynamic: function() {
-        // scale width based on target height
-        img.onload = function() {
-            alert(this.width + 'x' + this.height);
-        }
-        img.src = url;
     },
     
     getImageWidth: function(photo) {
@@ -102,7 +105,6 @@ var Collage = Class.extend({
     setupRows: function() {
         // have a target height
         // iterate through each photo
-        var img = new Image();                
         var rows = [];   
         var rowWidths = [];     
         var row = [];
