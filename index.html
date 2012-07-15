@@ -74,12 +74,18 @@
                           url: 'https://graph.facebook.com/' + fbAlbumId  +'/photos',
                           dataType: 'jsonp',
                           success: function(data) {
-                            photos = data.data;
-                            fbPhotoCache[fbAlbumId] = photos
-                            for (var i = 0; i < photos.length; i++) {
-                                photos[i].url = photos[i].source;
-                            }                    
-                            doRender();                                            
+                              if (data.error) {
+                                  alert('oops looks like this fb album id doesnt work, showing default photos..');
+                                  photos = defaultPhotos;
+                                  doRender();
+                              } else {
+                                  photos = data.data;
+                                  fbPhotoCache[fbAlbumId] = photos
+                                  for (var i = 0; i < photos.length; i++) {
+                                      photos[i].url = photos[i].source;
+                                  }                    
+                                  doRender();                                                                              
+                              }
                           }
                         });                                            
                     }
